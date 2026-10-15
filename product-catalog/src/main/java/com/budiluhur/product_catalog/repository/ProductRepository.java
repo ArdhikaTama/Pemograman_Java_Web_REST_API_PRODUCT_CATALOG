@@ -41,4 +41,17 @@ public class ProductRepository {
                         + "' tidak ditemukan!");
     }
 
+    public Product updateProduct(String id, Product updatedProduct)
+            throws ProductNotFoundException {
+        Product existingProduct = findById(id);
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        return existingProduct;
+    }
+
+    public boolean deleteById(String id) throws ProductNotFoundException {
+        Product existingProduct = findById(id);
+        return productList.remove(existingProduct); 
+    }
+
 }
