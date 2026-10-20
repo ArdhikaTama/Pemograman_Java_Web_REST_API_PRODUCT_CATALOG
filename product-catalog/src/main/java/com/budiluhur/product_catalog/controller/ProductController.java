@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.budiluhur.product_catalog.exception.ProductNotFoundException;
@@ -34,9 +35,17 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    // 2. GET BY ID: GET /api/products/{id}
+    // 2. SEARCH BY NAME: GET /api/products/search?keyword=keyboard
+    @GetMapping("/search")
+    public List<Product> searchProducts(
+            @RequestParam("keyword") String keyword) {
+        return productService.searchProductsByName(keyword);
+    }
+
+    // 3. GET BY ID: GET /api/products/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable("id") String id) {
+    public ResponseEntity<?> getProductById(
+            @PathVariable("id") String id) {
         try {
             Product product = productService.getProductById(id);
             return ResponseEntity.ok(product);
@@ -47,24 +56,28 @@ public class ProductController {
         }
     }
 
-    // 3. CREATE: POST /api/products
+    // 4. CREATE: POST /api/products
     @PostMapping
-    public ResponseEntity<String> createProduct(@RequestBody Product product) {
+    public ResponseEntity<String> createProduct(
+            @RequestBody Product product) {
         productService.createProduct(product);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Produk '" + product.getName()
                         + "' berhasil ditambahkan!");
     }
 
-    // 4. UPDATE: PUT /api/products/{id}
+    // 5. UPDATE: PUT /api/products/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") String id, @RequestBody Product product) {
+    public ResponseEntity<?> updateProduct(
+            @PathVariable("id") String id,
+            @RequestBody Product product) {
         try {
-            Product updatedProduct = productService.updateProduct(
-                    id, product);
-            return ResponseEntity
-                    .ok(updatedProduct);
+            Product updatedProduct =
+                    productService.updateProduct(id, product);
+
+            return ResponseEntity.ok(updatedProduct);
         } catch (ProductNotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
@@ -72,17 +85,20 @@ public class ProductController {
         }
     }
 
-    // 5. DELETE: DELETE /api/products/{id}
+    // 6. DELETE: DELETE /api/products/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable("id") String id) {
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable("id") String id) {
         try {
             productService.deleteProduct(id);
-            return ResponseEntity.ok("Produk dengan ID '" + id + "' berhasil dihapus!");
+
+            return ResponseEntity.ok(
+                    "Produk dengan ID '" + id
+                            + "' berhasil dihapus!");
         } catch (ProductNotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
     }
-
 }
